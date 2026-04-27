@@ -35,9 +35,84 @@ STEP-5: Display the obtained cipher text.
 
 
 Program:
+```
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+char keyT[5][5];
+
+void generateKey(char key[]) {
+    int used[26]={0}, k=0;
+    used['j'-'a']=1;
+
+    for(int i=0; key[i]; i++) {
+        char ch=tolower(key[i]);
+        if(!used[ch-'a']) {
+            keyT[k/5][k%5]=ch;
+            used[ch-'a']=1;
+            k++;
+        }
+    }
+
+    for(int i=0;i<26;i++)
+        if(!used[i])
+            keyT[k/5][k%5]=i+'a', k++;
+}
+
+void find(char ch,int *r,int *c) {
+    if(ch=='j') ch='i';
+    for(int i=0;i<5;i++)
+        for(int j=0;j<5;j++)
+            if(keyT[i][j]==ch)
+                *r=i,*c=j;
+}
+
+void process(char str[], int mode) {
+    int r1,c1,r2,c2;
+
+    for(int i=0; str[i]; i+=2) {
+        find(str[i],&r1,&c1);
+        find(str[i+1],&r2,&c2);
+
+        if(r1==r2) {
+            str[i]=keyT[r1][(c1+mode+5)%5];
+            str[i+1]=keyT[r2][(c2+mode+5)%5];
+        }
+        else if(c1==c2) {
+            str[i]=keyT[(r1+mode+5)%5][c1];
+            str[i+1]=keyT[(r2+mode+5)%5][c2];
+        }
+        else {
+            str[i]=keyT[r1][c2];
+            str[i+1]=keyT[r2][c1];
+        }
+    }
+}
+
+int main() {
+    char text[100], key[100];
+
+    printf("Enter key: ");
+    scanf("%s", key);
+
+    printf("Enter text: ");
+    scanf("%s", text);
+
+    generateKey(key);
+
+    process(text, 1);
+    printf("Encrypted: %s\n", text);
+
+    process(text, -1);
+    printf("Decrypted: %s", text);
+}
+```
 
 
 
 
 
 Output:
+
+<img width="1353" height="579" alt="image" src="https://github.com/user-attachments/assets/4cb809fe-d5de-4d51-8fd5-e879f1efbb48" />
